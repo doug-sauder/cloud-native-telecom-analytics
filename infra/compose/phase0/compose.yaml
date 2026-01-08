@@ -1,0 +1,27 @@
+#name: analytics
+
+services:
+  #pmgen:
+  #ingest:
+  #grafana:
+  postgres:
+    container_name: postgres
+    image: postgres:18
+    environment:
+      POSTGRES_USER: telecom
+      POSTGRES_PASSWORD: telecom
+      POSTGRES_DB: telecom
+      PGDATA: /var/lib/postgresql/18/docker
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./db/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U telecom"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 5
+networks:
+  analytics-net:
+volumes:
+  pgdata:
