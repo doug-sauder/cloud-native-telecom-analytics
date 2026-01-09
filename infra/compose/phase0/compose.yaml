@@ -1,9 +1,26 @@
 #name: analytics
 
 services:
-  #pmgen:
-  #ingest:
-  #grafana:
+  pmgen:
+  ingest:
+    build:
+      context: ../../../services/ingest
+      dockerfile: Dockerfile
+    container_name: ingest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - PGHOST=postgres
+      - PGUSER=telecom
+      - PGPASSWORD=telecom
+      - PGDATABASE=telecom
+      - PORT=3000
+    networks:
+      - analytics-net
+    ports:
+      - "3000:3000"
+  grafana:
   postgres:
     container_name: postgres
     image: postgres:18
