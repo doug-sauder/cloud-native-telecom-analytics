@@ -1,0 +1,50 @@
+#name: analytics
+
+services:
+  # pmgen:
+  ingest:
+    build:
+      context: ../../../services/ingest
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - PGHOST=postgres
+      - PGUSER=telecom
+      - PGPASSWORD=telecom
+      - PGDATABASE=telecom
+      - PORT=3000
+    networks:
+      - analytics-net
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/readyz >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+  # grafana:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: telecom
+      POSTGRES_PASSWORD: telecom
+      POSTGRES_DB: telecom
+      PGDATA: /var/lib/postgresql/18/docker
+    networks:
+      - analytics-net
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./db/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U telecom"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 5
+networks:
+  analytics-net:
+volumes:
+  pgdata:
