@@ -2,11 +2,13 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-COPY package.json package-lock.json* ./
-RUN npm ci --production --silent
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --silent
 
-COPY src ./src
+COPY --chown=node:node src ./src
 
-EXPOSE 3000
 ENV NODE_ENV=production
-CMD ["node","src/server.js"]
+EXPOSE 3000
+
+USER node
+CMD ["node", "src/server.js"]

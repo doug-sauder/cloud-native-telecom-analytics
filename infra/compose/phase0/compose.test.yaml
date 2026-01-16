@@ -1,0 +1,26 @@
+services:
+  test:
+    profiles: ["test"]
+    image: node:20-alpine
+    working_dir: /workspace
+    volumes:
+      - ../../../services/ingest:/workspace:ro
+      - ingest-node_modules:/workspace/node_modules
+      - ingest-npm-cache:/root/.npm
+    environment:
+      - API_BASE_URL=http://ingest:3000
+      - NODE_OPTIONS=--experimental-vm-modules --no-warnings
+      - NODE_ENV=test
+    depends_on:
+      ingest:
+        condition: service_healthy
+    networks:
+      - analytics-net
+    command: ["sh", "-c", "npm ci --silent && npm run test:integration"]
+
+networks:
+  analytics-net:
+
+volumes:
+  ingest-node_modules:
+  ingest-npm-cache:

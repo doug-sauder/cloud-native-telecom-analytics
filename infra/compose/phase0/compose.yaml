@@ -1,12 +1,11 @@
 #name: analytics
 
 services:
-  pmgen:
+  # pmgen:
   ingest:
     build:
       context: ../../../services/ingest
       dockerfile: Dockerfile
-    container_name: ingest
     depends_on:
       postgres:
         condition: service_healthy
@@ -20,15 +19,22 @@ services:
       - analytics-net
     ports:
       - "3000:3000"
-  grafana:
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/readyz >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+  # grafana:
   postgres:
-    container_name: postgres
     image: postgres:18
     environment:
       POSTGRES_USER: telecom
       POSTGRES_PASSWORD: telecom
       POSTGRES_DB: telecom
       PGDATA: /var/lib/postgresql/18/docker
+    networks:
+      - analytics-net
     volumes:
       - pgdata:/var/lib/postgresql
       - ./db/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
