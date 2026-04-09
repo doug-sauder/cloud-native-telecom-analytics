@@ -171,17 +171,17 @@ No schema changes required.
 * Add Redpanda container to compose
 * Verify topic creation and connectivity
 
-### Step 2 — Implement Producer (pmgen)
-
-* Add Kafka client library (Python)
-* Publish events to topic
-* Validate event flow via logs
-
-### Step 3 — Implement Consumer (ingest)
+### Step 2 — Implement Consumer (ingest)
 
 * Add Kafka client library (Node.js)
 * Implement polling loop
 * Add batch insert logic
+
+### Step 3 — Implement Producer (pmgen)
+
+* Add Kafka client library (Python)
+* Publish events to topic
+* Validate event flow via logs
 
 ### Step 4 — Add Metrics
 
